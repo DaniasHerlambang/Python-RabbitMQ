@@ -64,7 +64,17 @@ def main():
     channel_http = connection.channel()
     channel_http.queue_declare(queue='autopay.httpstats', durable=True)
 
-    with open(args[0], 'r') as fin:
+    #start parsing dan replace path sesuai datetime.now() :)
+    waktu_set = ["{date}","{month}", "{year}"]
+    waktu_now = [str(datetime.now().day), str(datetime.now().month), str(datetime.now().year)]
+    waktu_dynamic = args[0]
+    for l, s in enumerate(waktu_set):
+        waktu_dynamic = waktu_dynamic.replace(s,waktu_now[l])
+    print (waktu_dynamic)
+    #end parsing dan replace path sesuai datetime.now() :)
+    
+
+    with open(waktu_dynamic, 'r') as fin:
         for line in readlines_then_tail(fin):
 
             log_data = []
@@ -78,11 +88,6 @@ def main():
 
             with open('date.log','r') as reader:
                 patokan_waktu =  reader.read()
-                # open('post_request.log', 'r+').truncate(0)              #kosongkan "post_request.log"
-
-                # #menulis di realtime.log daftar clien
-                # with open('post_request.log','w+') as f:
-                #      f.write("%s\n" % json.dumps(self.requests))
                 xx_date = datetime.datetime.strptime(data['date'], '%d/%b/%Y:%H:%M:%S')
                 if patokan_waktu == '' :
                     #menulis di date.log daftar clien
