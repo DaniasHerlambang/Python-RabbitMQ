@@ -25,6 +25,7 @@ from optparse import OptionParser
 
 open('count.log', 'r+').truncate(0)              #kosongkan "count.log"
 open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
+open('real_date.log', 'r+').truncate(0)
 
 SLEEP_INTERVAL = 1.0
 
@@ -46,12 +47,26 @@ def readlines_then_tail(fin):
                         from datetime import datetime
                         date_read =  reader.read()
                         date_s = datetime.strptime(date_read, "%Y-%m-%d  %H:%M:%S.%f")
-                        if date_s.year == datetime.now().year and date_s.month == datetime.now().month and date_s.day == datetime.now().day:
+
+                        if date_s.year == datetime.now().year:
                             pass
-                        if date_s.year == datetime.now().year and date_s.month == datetime.now().month and date_s.day != datetime.now().day:
+                            if date_s.month == datetime.now().month:
+                                pass
+                                if date_s.day == datetime.now().day:
+                                    pass
+                                else:
+                                    print('ganti tanggal')
+                                    open('real_date.log', 'r+').truncate(0)
+                                    quit()
+                            else:
+                                print('ganti bulan')
+                                open('real_date.log', 'r+').truncate(0)
+                                quit()
+                        else:
                             print('ganti tanggal')
                             open('real_date.log', 'r+').truncate(0)
                             quit()
+
             tail(fin)
 
 def tail(fin):
@@ -70,17 +85,49 @@ def kosongkan(data):
     with open('date.log','w+') as f:
          f.write("%s" % data['date'])
 
-def main():
-    p = OptionParser("usage: tail.py file")
-    (options, args) = p.parse_args()
-    if len(args) < 1:
-        p.error("must specify a file to watch")
-
+def send_data(kirim_hitungan , kirim_waktu):
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host='0.0.0.0'))
 
     channel_http = connection.channel()
     channel_http.queue_declare(queue='autopay.httpstats', durable=True)
+    datajson = {
+        "socket_key"     : '34c9efc9-8996-4a8e-b58e-2c1dfa3a56e8',
+        # "hostname"      : socket.gethostname(),
+        "hostname"      : 'Host-AP-001',
+        "ip"            : socket.gethostbyname(socket.gethostname()),
+        "req_total"     : int(kirim_hitungan),
+        "req_succes"    : int(kirim_hitungan),
+        "req_failed"    : 0,
+        "timestamp"     : format(datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')),
+        }
+    datasave = {
+        "socket_key"     : '34c9efc9-8996-4a8e-b58e-2c1dfa3a56e8',
+        # "hostname"      : socket.gethostname(),
+        "hostname"      : 'Host-AP-001',
+        "ip"            : socket.gethostbyname(socket.gethostname()),
+        "req_total"     : int(kirim_hitungan),
+        "req_succes"    : int(kirim_hitungan),
+        "req_failed"    : 0,
+        "timestamp"     : datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S'),
+        }
+
+    API_ENDPOINT = "http://127.0.0.1:8000/app/http"
+    r = requests.post(url = API_ENDPOINT, data = datasave)
+
+    channel_http.basic_publish(
+        exchange='amq.topic',
+        routing_key='autopay.httpstats',
+        body=json.dumps(datajson),
+        properties=pika.BasicProperties(
+            delivery_mode=2,  # make message persistent
+        ))
+
+def main():
+    p = OptionParser("usage: tail.py file")
+    (options, args) = p.parse_args()
+    if len(args) < 1:
+        p.error("must specify a file to watch")
 
     #parsing dan replace path sesuai datetime.now() !!!
     import datetime
@@ -137,58 +184,33 @@ def main():
                 else:
                     date_now_request = datetime.datetime.strptime(patokan_waktu, '%d/%b/%Y:%H:%M:%S')
                     if date_now_request.year == xx_date.year :
-                        print('as')
+                        # print('as')
+                        pass
                         if date_now_request.month == xx_date.month :
-                            print('ass')
+                            # print('ass')
+                            pass
                             if  date_now_request.day == xx_date.day :
-                                print('asss')
+                                # print('asss')
+                                pass
                                 if date_now_request.hour == xx_date.hour and date_now_request.minute == xx_date.minute :
-                                    print('sama ' , date_now_request , xx_date)
+                                    # print('sama ' , date_now_request , xx_date)
                                     with open('count.log','r') as reader:
                                         hitungan =  reader.read()
                                     open('count.log', 'r+').truncate(0)              #kosongkan "count.log"
                                     with open('count.log','w+') as f:
                                          f.write("%s" % str(int(hitungan)+1))
-                                    print(hitungan)
+                                    # print(hitungan)
                                 else:
                                     print('beda1' , data['date'])
                                     with open('count.log','r') as reader:
                                         kirim_hitungan =  reader.read()
                                     with open('date.log','r') as reader:
                                         kirim_waktu =  reader.read()
-                                    print(line.strip() , 'cek cek cek ')
-                                    datajson = {
-                                        "socket_key"     : '34c9efc9-8996-4a8e-b58e-2c1dfa3a56e8',
-                                        # "hostname"      : socket.gethostname(),
-                                        "hostname"      : 'Host-AP-001',
-                                        "ip"            : socket.gethostbyname(socket.gethostname()),
-                                        "req_total"     : int(kirim_hitungan),
-                                        "req_succes"    : int(kirim_hitungan),
-                                        "req_failed"    : 0,
-                                        "timestamp"     : format(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')),
-                                        }
-                                    datasave = {
-                                        "socket_key"     : '34c9efc9-8996-4a8e-b58e-2c1dfa3a56e8',
-                                        # "hostname"      : socket.gethostname(),
-                                        "hostname"      : 'Host-AP-001',
-                                        "ip"            : socket.gethostbyname(socket.gethostname()),
-                                        "req_total"     : int(kirim_hitungan),
-                                        "req_succes"    : int(kirim_hitungan),
-                                        "req_failed"    : 0,
-                                        "timestamp"     : datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S'),
-                                        }
-
-                                    # API_ENDPOINT = "http://127.0.0.1:8000/app/http"
-                                    # r = requests.post(url = API_ENDPOINT, data = datasave)
-
-                                    channel_http.basic_publish(
-                                        exchange='amq.topic',
-                                        routing_key='autopay.httpstats',
-                                        body=json.dumps(datajson),
-                                        properties=pika.BasicProperties(
-                                            delivery_mode=2,  # make message persistent
-                                        ))
-                                    # print(" [x] Sent %r" % datajson)
+                                    # print(line.strip() , 'cek cek cek ')
+                                    if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
+                                        print('aasas', kirim_hitungan , kirim_waktu)
+                                    else:
+                                        send_data(kirim_hitungan , kirim_waktu)
 
                                     open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
                                     with open('date.log','w+') as f:
@@ -199,6 +221,16 @@ def main():
                                          f.write("%s" % 1)
                             else:
                                 print('beda2')
+                                with open('count.log','r') as reader:
+                                    kirim_hitungan =  reader.read()
+                                with open('date.log','r') as reader:
+                                    kirim_waktu =  reader.read()
+                                # print(line.strip() , 'cek cek cek ')
+                                if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
+                                    print('aasas', kirim_hitungan , kirim_waktu)
+                                else:
+                                    send_data(kirim_hitungan , kirim_waktu)
+
                                 open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
                                 with open('date.log','w+') as f:
                                      f.write("%s" % data['date'])
@@ -208,6 +240,16 @@ def main():
                                      f.write("%s" % 1)
                         else:
                             print('beda3')
+                            with open('count.log','r') as reader:
+                                kirim_hitungan =  reader.read()
+                            with open('date.log','r') as reader:
+                                kirim_waktu =  reader.read()
+                            # print(line.strip() , 'cek cek cek ')
+                            if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
+                                print('aasas', kirim_hitungan , kirim_waktu)
+                            else:
+                                send_data(kirim_hitungan , kirim_waktu)
+
                             open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
                             with open('date.log','w+') as f:
                                  f.write("%s" % data['date'])
@@ -216,14 +258,26 @@ def main():
                             with open('count.log','w+') as f:
                                  f.write("%s" % 1)
                     else:
-                        print('beda4')
-                        open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
-                        with open('date.log','w+') as f:
-                             f.write("%s" % data['date'])
+                        if date_now_request.year != xx_date.year :
+                            print('beda4')
 
-                        open('count.log', 'r+').truncate(0)              #kosongkan "count.log"
-                        with open('count.log','w+') as f:
-                             f.write("%s" % 1)
+                            with open('count.log','r') as reader:
+                                kirim_hitungan =  reader.read()
+                            with open('date.log','r') as reader:
+                                kirim_waktu =  reader.read()
+                            # print(line.strip() , 'cek cek cek ')
+                            if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
+                                print('aasas', kirim_hitungan , kirim_waktu)
+                            else:
+                                send_data(kirim_hitungan , kirim_waktu)
+
+                            open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
+                            with open('date.log','w+') as f:
+                                 f.write("%s" % data['date'])
+
+                            open('count.log', 'r+').truncate(0)              #kosongkan "count.log"
+                            with open('count.log','w+') as f:
+                                 f.write("%s" % 1)
 
 if __name__ == '__main__':
     main()
