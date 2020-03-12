@@ -21,10 +21,10 @@ import psycopg2
 
 import time
 from optparse import OptionParser
+# chmod a+x "name".py
 
 open('count.log', 'r+').truncate(0)              #kosongkan "count.log"
 open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
-
 
 SLEEP_INTERVAL = 1.0
 
@@ -35,6 +35,23 @@ def readlines_then_tail(fin):
         if line:
             yield line
         else:
+            with open('real_date.log','r') as reader:
+                from datetime import datetime
+                date_x =  reader.read()
+                if date_x == '':
+                    with open('real_date.log','w+') as f:
+                        f.write("%s" % datetime.now())
+                else:
+                    with open('real_date.log','r') as reader:
+                        from datetime import datetime
+                        date_read =  reader.read()
+                        date_s = datetime.strptime(date_read, "%Y-%m-%d  %H:%M:%S.%f")
+                        if date_s.year == datetime.now().year and date_s.month == datetime.now().month and date_s.day == datetime.now().day:
+                            pass
+                        if date_s.year == datetime.now().year and date_s.month == datetime.now().month and date_s.day != datetime.now().day:
+                            print('ganti tanggal')
+                            open('real_date.log', 'r+').truncate(0)
+                            quit()
             tail(fin)
 
 def tail(fin):
@@ -52,6 +69,7 @@ def kosongkan(data):
     open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
     with open('date.log','w+') as f:
          f.write("%s" % data['date'])
+
 def main():
     p = OptionParser("usage: tail.py file")
     (options, args) = p.parse_args()
@@ -64,21 +82,21 @@ def main():
     channel_http = connection.channel()
     channel_http.queue_declare(queue='autopay.httpstats', durable=True)
 
-    #start parsing dan replace path sesuai datetime.now() :)
+    #parsing dan replace path sesuai datetime.now() !!!
+    import datetime
+    from datetime import datetime
     waktu_set = ["{date}","{month}", "{year}"]
     waktu_now = [str(datetime.now().day), str(datetime.now().month), str(datetime.now().year)]
+    # waktu_now = [datetime.now().day, datetime.now().month, datetime.now().year]
     waktu_dynamic = args[0]
     for l, s in enumerate(waktu_set):
         waktu_dynamic = waktu_dynamic.replace(s,waktu_now[l])
-    print (waktu_dynamic)
-    #end parsing dan replace path sesuai datetime.now() :)
-    
 
+    # print(args[0])
     with open(waktu_dynamic, 'r') as fin:
         for line in readlines_then_tail(fin):
+            # print (line.strip())
 
-            log_data = []
-            date_now = []
             LOG_REGEX = '(?P<ip>.*) - - \[(?P<date>.*?) +(.*?)\] "(?P<method>\w+) (?P<request_path>.*?) HTTP/(?P<http_version>.*?)" (?P<status_code>\d+) (?P<response_size>.*?) "(?P<referrer>.*?)" "(?P<user_agent>.*?)"'
             compiled = re.compile(LOG_REGEX)
 
@@ -88,6 +106,7 @@ def main():
 
             with open('date.log','r') as reader:
                 patokan_waktu =  reader.read()
+
                 xx_date = datetime.datetime.strptime(data['date'], '%d/%b/%Y:%H:%M:%S')
                 if patokan_waktu == '' :
                     #menulis di date.log daftar clien
@@ -118,11 +137,11 @@ def main():
                 else:
                     date_now_request = datetime.datetime.strptime(patokan_waktu, '%d/%b/%Y:%H:%M:%S')
                     if date_now_request.year == xx_date.year :
-                        print('is')
+                        print('as')
                         if date_now_request.month == xx_date.month :
-                            print('iss')
+                            print('ass')
                             if  date_now_request.day == xx_date.day :
-                                print('isss')
+                                print('asss')
                                 if date_now_request.hour == xx_date.hour and date_now_request.minute == xx_date.minute :
                                     print('sama ' , date_now_request , xx_date)
                                     with open('count.log','r') as reader:
@@ -159,8 +178,8 @@ def main():
                                         "timestamp"     : datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S'),
                                         }
 
-                                    API_ENDPOINT = "http://127.0.0.1:8000/app/http"
-                                    r = requests.post(url = API_ENDPOINT, data = datasave)
+                                    # API_ENDPOINT = "http://127.0.0.1:8000/app/http"
+                                    # r = requests.post(url = API_ENDPOINT, data = datasave)
 
                                     channel_http.basic_publish(
                                         exchange='amq.topic',
