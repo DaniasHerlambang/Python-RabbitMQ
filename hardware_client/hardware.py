@@ -18,7 +18,9 @@ from datetime import timedelta
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--interval",  help="set interval")
 parser.add_argument("-host", "--host",  help="set host")
-# read arguments from the command line
+parser.add_argument("-rr","--routingrabbit", help="routing rabbit")
+parser.add_argument("-sk","--socketkey", help="socket vm")
+
 args = parser.parse_args()
 
 # call back example : args.interval
@@ -28,12 +30,7 @@ while True:
         pika.ConnectionParameters(host=args.host))
 
     channel1 = connection.channel()
-    channel1.queue_declare(queue='autopay.hwstats', durable=True)
-
-    channel2 = connection.channel()
-    channel2.queue_declare(queue='to_api_server', durable=True)
-
-    message = ' '.join(sys.argv[1:]) or "Hello World!"
+    channel1.queue_declare(queue='%s.hwstats' % args.routingrabbit , durable=True)
 
 #*******************************************************************************************************88
 
@@ -59,9 +56,9 @@ while True:
     datajson = {
         # "id"            : new_id + 1,
         # "vm_id"         :  2,
-        "socket_key"     : '34c9efc9-8996-4a8e-b58e-2c1dfa3a56e8',
-        # "hostname"      : socket.gethostname(),
-        "hostname"      : 'Host-AP-001',
+        "socket_key"     : args.routingrabbit,
+        "hostname"      : socket.gethostname(),
+        # "hostname"      : 'Host-AP-001',
         "ip"            : socket.gethostbyname(socket.gethostname()),
         "cpu"           : data_cpu,
         "disk_total"    : data_total_disk,
@@ -75,9 +72,9 @@ while True:
     datasave = {
         # "id"            : new_id + 1,
         # "vm_id"         :  2,
-        "socket_vm"     : '34c9efc9-8996-4a8e-b58e-2c1dfa3a56e8',
-        # "hostname"      : socket.gethostname(),
-        "hostname"      : 'Host-AP-001',
+        "socket_vm"     : args.routingrabbit,
+        "hostname"      : socket.gethostname(),
+        # "hostname"      : 'Host-AP-001',
         "ip"            : socket.gethostbyname(socket.gethostname()),
         "cpu"           : data_cpu  ,
         "disk_total"    : total_disk // (2**30),
@@ -98,19 +95,11 @@ while True:
 
     channel1.basic_publish(
         exchange='amq.topic',
-        routing_key='autopay.hwstats',
+        routing_key='%s.hwstats' % args.routingrabbit,
         body=json.dumps(datajson),
         properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent
         ))
-
-    # channel2.basic_publish(
-    #     exchange='amq.topic',
-    #     routing_key='to_api_server',
-    #     body=json.dumps(datajson),
-    #     properties=pika.BasicProperties(
-    #         delivery_mode=2,  # make message persistent
-    #     ))
 
     print(" [x] Sent %r" % datajson)
     connection.close()

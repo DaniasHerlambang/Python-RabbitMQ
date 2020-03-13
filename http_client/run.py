@@ -12,7 +12,7 @@ if len(args) < 1:
 
 while True:
   print("Launching process..")
-  p = subprocess.Popen("python3.7 http_stat.py %s" % args[0], shell=True)
+  p = subprocess.Popen("python3.7 http_stat.py %s %s %s %s" % (args[0], args[1], args[2], args[3]), shell=True)
   p.wait()
   print("Process change the date, search file. Restarting in 2 seconds..")
   time.sleep(2)
