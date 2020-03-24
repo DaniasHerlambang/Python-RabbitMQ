@@ -86,7 +86,7 @@ while True:
         # "create"        : datetime.now()
         }
 
-    API_ENDPOINT = "http://127.0.0.1:8000/app/socket"
+    API_ENDPOINT = "https://autopay.env-playground.online/app/socket"
     r = requests.post(url = API_ENDPOINT, data = datasave)
     socket_url = r.text
     print("The socket URL is:%s"%socket_url)
