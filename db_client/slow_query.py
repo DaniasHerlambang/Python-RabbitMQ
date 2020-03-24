@@ -98,7 +98,7 @@ if args.type == 'mongo':
 
                     # print(datajson)
 
-                    API_ENDPOINT = "http://127.0.0.1:8000/app/db"
+                    API_ENDPOINT = "https://autopay.env-playground.online/app/db"
                     r = requests.post(url = API_ENDPOINT, data = datasave)
 
                     channel_http.basic_publish(
@@ -171,7 +171,7 @@ if args.type == 'mysql':
                     "create"     : format(datetime.now() ),
                     }
 
-                API_ENDPOINT = "http://127.0.0.1:8000/app/db"
+                API_ENDPOINT = "https://autopay.env-playground.online/app/db"
                 r = requests.post(url = API_ENDPOINT, data = datasave)
 
                 channel_http.basic_publish(

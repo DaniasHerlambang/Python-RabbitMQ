@@ -91,8 +91,8 @@ def send_data(kirim_hitungan , kirim_waktu , hosts , socket_key ,routing_key ):
     channel_http.queue_declare(queue='%s.httpstats' % routing_key, durable=True)
     datajson = {
         "socket_key"     : socket_key,
-        # "hostname"      : socket.gethostname(),
-        "hostname"      : 'Host-AP-001',
+        "hostname"      : socket.gethostname(),
+        # "hostname"      : 'Host-AP-001',
         "ip"            : socket.gethostbyname(socket.gethostname()),
         "req_total"     : int(kirim_hitungan),
         "req_succes"    : int(kirim_hitungan),
@@ -101,8 +101,8 @@ def send_data(kirim_hitungan , kirim_waktu , hosts , socket_key ,routing_key ):
         }
     datasave = {
         "socket_key"     : socket_key,
-        # "hostname"      : socket.gethostname(),
-        "hostname"      : 'Host-AP-001',
+        "hostname"      : socket.gethostname(),
+        # "hostname"      : 'Host-AP-001',
         "ip"            : socket.gethostbyname(socket.gethostname()),
         "req_total"     : int(kirim_hitungan),
         "req_succes"    : int(kirim_hitungan),
