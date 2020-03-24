@@ -110,7 +110,7 @@ def send_data(kirim_hitungan , kirim_waktu , hosts , socket_key ,routing_key ):
         "timestamp"     : datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S'),
         }
 
-    API_ENDPOINT = "http://127.0.0.1:8000/app/http"
+    API_ENDPOINT = "https://autopay.env-playground.online/app/http"
     r = requests.post(url = API_ENDPOINT, data = datasave)
 
     channel_http.basic_publish(

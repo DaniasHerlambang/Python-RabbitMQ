@@ -56,7 +56,7 @@ while True:
     datajson = {
         # "id"            : new_id + 1,
         # "vm_id"         :  2,
-        "socket_key"     : args.routingrabbit,
+        "socket_key"     : args.socketkey,
         "hostname"      : socket.gethostname(),
         # "hostname"      : 'Host-AP-001',
         "ip"            : socket.gethostbyname(socket.gethostname()),
@@ -72,7 +72,7 @@ while True:
     datasave = {
         # "id"            : new_id + 1,
         # "vm_id"         :  2,
-        "socket_vm"     : args.routingrabbit,
+        "socket_vm"     : args.socketkey,
         "hostname"      : socket.gethostname(),
         # "hostname"      : 'Host-AP-001',
         "ip"            : socket.gethostbyname(socket.gethostname()),
