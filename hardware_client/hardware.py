@@ -30,7 +30,7 @@ while True:
         pika.ConnectionParameters(host=args.host))
 
     channel1 = connection.channel()
-    channel1.queue_declare(queue='%s.hwstats' % args.routingrabbit , durable=True)
+    channel1.queue_declare(queue='%s.hwstats' % str(args.routingrabbit) , durable=True)
 
 #*******************************************************************************************************88
 
@@ -56,7 +56,7 @@ while True:
     datajson = {
         # "id"            : new_id + 1,
         # "vm_id"         :  2,
-        "socket_key"     :str(args.socketkey),
+        "socket_key"     : str(args.socketkey),
         "hostname"      : socket.gethostname(),
         # "hostname"      : 'Host-AP-001',
         "ip"            : socket.gethostbyname(socket.gethostname()),
@@ -86,7 +86,7 @@ while True:
         # "create"        : datetime.now()
         }
 
-    API_ENDPOINT = "https://autopay.env-playground.online/app/socket"
+    API_ENDPOINT = "https://autopay.env-playground.online/api/app/socket"
     r = requests.post(url = API_ENDPOINT, data = datasave)
     socket_url = r.text
     print("The socket URL is:%s"%socket_url)
@@ -95,7 +95,7 @@ while True:
 
     channel1.basic_publish(
         exchange='amq.topic',
-        routing_key='%s.hwstats' % args.routingrabbit,
+        routing_key='%s.hwstats' % str(args.routingrabbit),
         body=json.dumps(datajson),
         properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent
