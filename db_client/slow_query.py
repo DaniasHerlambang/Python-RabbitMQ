@@ -130,8 +130,8 @@ if args.type == 'mysql':
         cnx = mysql.connector.connect(
             host= args.hostdb,
             port= int(args.portdb),
-            user= args.username ,
-            password= args.password)
+            user= str(args.username) ,
+            password= str(args.password))
 
         # Get a cursor
         cur = cnx.cursor()
