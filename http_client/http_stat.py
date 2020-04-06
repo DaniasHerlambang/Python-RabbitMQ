@@ -131,7 +131,10 @@ def main():
     import datetime
     from datetime import datetime
     waktu_set = ["{date}","{month}", "{year}"]
-    waktu_now = [str(datetime.now().day), str(datetime.now().month), str(datetime.now().year)]
+    a = int(datetime.now().day)
+    aa = '%02d' % a
+    waktu_now = [ str(aa) , str(datetime.now().month), str(datetime.now().year)]
+    # waktu_now = [str(datetime.now().day), str(datetime.now().month), str(datetime.now().year)]
     # waktu_now = [datetime.now().day, datetime.now().month, datetime.now().year]
     waktu_dynamic = args[0]
     for l, s in enumerate(waktu_set):
