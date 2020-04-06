@@ -146,11 +146,15 @@ def main():
             # print (line.strip())
 
             LOG_REGEX = '(?P<ip>.*) - - \[(?P<date>.*?) +(.*?)\] "(?P<method>\w+) (?P<request_path>.*?) HTTP/(?P<http_version>.*?)" (?P<status_code>\d+) (?P<response_size>.*?) "(?P<referrer>.*?)" "(?P<user_agent>.*?)"'
-            compiled = re.compile(LOG_REGEX)
 
-            import datetime
-            match = compiled.match(line.strip())
-            data = match.groupdict()
+            try:
+                compiled = re.compile(LOG_REGEX)
+
+                import datetime
+                match = compiled.match(line.strip())
+                data = match.groupdict()
+            except:
+                pass
 
             with open('date.log','r') as reader:
                 patokan_waktu =  reader.read()
@@ -208,10 +212,10 @@ def main():
                                     with open('date.log','r') as reader:
                                         kirim_waktu =  reader.read()
                                     # print(line.strip() , 'cek cek cek ')
-                                    if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
-                                        print('aasas', kirim_hitungan , kirim_waktu)
-                                    else:
-                                        send_data(kirim_hitungan , kirim_waktu , args[1], args[2] , args[3])
+                                    # if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
+                                    #     print(datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S'))
+                                    # else:
+                                    send_data(kirim_hitungan , kirim_waktu , args[1], args[2] , args[3])
 
                                     open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
                                     with open('date.log','w+') as f:
@@ -227,10 +231,10 @@ def main():
                                 with open('date.log','r') as reader:
                                     kirim_waktu =  reader.read()
                                 # print(line.strip() , 'cek cek cek ')
-                                if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
-                                    print('aasas', kirim_hitungan , kirim_waktu)
-                                else:
-                                    send_data(kirim_hitungan , kirim_waktu , args[1], args[2] , args[3])
+                                # if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
+                                #     print(datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S'))
+                                # else:
+                                send_data(kirim_hitungan , kirim_waktu , args[1], args[2] , args[3])
 
                                 open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
                                 with open('date.log','w+') as f:
@@ -246,10 +250,10 @@ def main():
                             with open('date.log','r') as reader:
                                 kirim_waktu =  reader.read()
                             # print(line.strip() , 'cek cek cek ')
-                            if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
-                                print('aasas', kirim_hitungan , kirim_waktu)
-                            else:
-                                send_data(kirim_hitungan , kirim_waktu , args[1], args[2] , args[3])
+                            # if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
+                            #     print(datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S'))
+                            # else:
+                            send_data(kirim_hitungan , kirim_waktu , args[1], args[2] , args[3])
 
                             open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
                             with open('date.log','w+') as f:
@@ -267,10 +271,12 @@ def main():
                             with open('date.log','r') as reader:
                                 kirim_waktu =  reader.read()
                             # print(line.strip() , 'cek cek cek ')
-                            if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
-                                print('aasas', kirim_hitungan , kirim_waktu)
-                            else:
-                                send_data(kirim_hitungan , kirim_waktu , args[1], args[2] , args[3])
+                            # if datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S') < datetime.datetime.now():
+                            #     print(datetime.datetime.strptime(str(datetime.datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S'))
+                            # else:
+                            send_data(kirim_hitungan , kirim_waktu , args[1], args[2] , args[3])
+                            # print(str(datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')))
+                            # print(datetime.strptime(str(datetime.strptime(kirim_waktu, '%d/%b/%Y:%H:%M:%S')), '%Y-%m-%d  %H:%M:%S'))
 
                             open('date.log', 'r+').truncate(0)              #kosongkan "date.log"
                             with open('date.log','w+') as f:
@@ -279,8 +285,6 @@ def main():
                             open('count.log', 'r+').truncate(0)              #kosongkan "count.log"
                             with open('count.log','w+') as f:
                                  f.write("%s" % 1)
-
-
 
 if __name__ == '__main__':
     main()
